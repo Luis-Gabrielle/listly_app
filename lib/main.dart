@@ -33,7 +33,7 @@ class _MyAppState extends State<MyApp> {
 
 class MyHomePage extends StatelessWidget {
   final String title;
-  final Function toggleTheme;
+  final VoidCallback toggleTheme;
 
   const MyHomePage({super.key, required this.title, required this.toggleTheme});
 
@@ -41,23 +41,21 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        title: Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
-            icon: Icon(Icons.brightness_6),
-            onPressed: () => toggleTheme(),
+            icon: const Icon(Icons.brightness_6),
+            onPressed: toggleTheme,
           ),
         ],
       ),
       body: Center(
         child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => GetStartedPage()),
-            );
-          },
-          child: Text('Get Started'),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const GetStartedPage()),
+          ),
+          child: const Text('Get Started'),
         ),
       ),
     );
@@ -73,7 +71,6 @@ class GetStartedPage extends StatefulWidget {
 
 class _GetStartedPageState extends State<GetStartedPage> {
   final TextEditingController _nameController = TextEditingController();
-
   String _name = '';
   Color _cardColor = Colors.white;
 
@@ -88,135 +85,73 @@ class _GetStartedPageState extends State<GetStartedPage> {
   };
 
   void _pickColor(Color color) {
-    setState(() {
-      _cardColor = color;
-    });
+    setState(() => _cardColor = color);
   }
 
   void _saveAndNavigate() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => DisplayPage(name: _name, cardColor: _cardColor),
-      ),
+      MaterialPageRoute(builder: (context) => DisplayPage(name: _name, cardColor: _cardColor)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Card Name'),
-      ),
+      appBar: AppBar(title: const Text('Card Name')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: double.infinity,
-              child: Card(
-                color: _cardColor,
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.black, width: 1),
-                  borderRadius: BorderRadius.circular(9.0),
-                ),
-                elevation: 0,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Image.asset('assets/images/list.png', width: 200, height: 200),
-                      SizedBox(height: 4),
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: CustomPaint(
-                          size: Size(double.infinity, 1),
-                          painter: DashedLinePainter(),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2.0), // Reduced top margin
-                        child: Text('Name: $_name', style: TextStyle(fontFamily: 'AestheticFont', fontSize: 18)),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 10),
+            _buildCardPreview(),
+            const SizedBox(height: 10),
             Text(
               'Selected Color: ${_colorNames[_cardColor] ?? "Custom"}',
-              style: TextStyle(fontFamily: 'AestheticFont', fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _colorPicker(Colors.red),
-                _colorPicker(Colors.green),
-                _colorPicker(Colors.blue),
-                _colorPicker(Colors.yellow),
-                _colorPicker(Colors.orange),
-                _colorPicker(Colors.purple),
-                _colorPicker(Colors.brown),
-                IconButton(
-                  icon: Icon(Icons.add_circle, color: Colors.blue),
-                  onPressed: () {
-                    // Add custom color picker functionality here
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Name',
-              style: TextStyle(fontFamily: 'AestheticFont', fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                labelStyle: TextStyle(color: Colors.transparent),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 1),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 1),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _name = value;
-                });
-              },
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _saveAndNavigate,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.yellow,
-                      foregroundColor: Colors.black,
-                      side: BorderSide(color: Colors.black, width: 1),
-                      minimumSize: Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                    ),
-                    child: Text('Save'),
-                  ),
-                ),
-              ],
-            ),
+            const SizedBox(height: 20),
+            _buildColorPicker(),
+            const SizedBox(height: 20),
+            _buildNameInput(),
+            const SizedBox(height: 20),
+            _buildSaveButton(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCardPreview() {
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        color: _cardColor,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: Colors.black, width: 1),
+          borderRadius: BorderRadius.circular(9.0),
+        ),
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset('assets/images/list.png', width: 200, height: 200),
+              const SizedBox(height: 4),
+              const Divider(),
+              Text('Name: $_name', style: const TextStyle(fontSize: 18)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorPicker() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: _colorNames.keys.map((color) => _colorPicker(color)).toList(),
     );
   }
 
@@ -234,28 +169,34 @@ class _GetStartedPageState extends State<GetStartedPage> {
       ),
     );
   }
-}
 
-class DashedLinePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    var paint = Paint()
-      ..color = Colors.black
-      ..strokeWidth = 1;
-
-    var max = size.width;
-    var dashWidth = 5;
-    var dashSpace = 3;
-    double startX = 0;
-
-    while (startX < max) {
-      canvas.drawLine(Offset(startX, 0), Offset(startX + dashWidth, 0), paint);
-      startX += dashWidth + dashSpace;
-    }
+  Widget _buildNameInput() {
+    return TextField(
+      controller: _nameController,
+      decoration: const InputDecoration(
+        labelText: 'Name',
+        border: OutlineInputBorder(),
+      ),
+      onChanged: (value) => setState(() => _name = value),
+    );
   }
 
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  Widget _buildSaveButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _saveAndNavigate,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.yellow,
+          foregroundColor: Colors.black,
+          side: const BorderSide(color: Colors.black, width: 1),
+          minimumSize: const Size(double.infinity, 50),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+        ),
+        child: const Text('Save'),
+      ),
+    );
+  }
 }
 
 class DisplayPage extends StatelessWidget {
@@ -267,49 +208,30 @@ class DisplayPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Display Page'),
-      ),
+      appBar: AppBar(title: const Text('Display Page')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hello, $name', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: Card(
-                color: cardColor,
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.black, width: 1),
-                  borderRadius: BorderRadius.circular(9.0),
-                ),
-                elevation: 0,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Image.asset('assets/images/list.png', width: 200, height: 200),
-                      SizedBox(height: 4), // Reduced height
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: CustomPaint(
-                          size: Size(double.infinity, 1),
-                          painter: DashedLinePainter(),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2.0), // Reduced top margin
-                        child: Text('Name: $name', style: TextStyle(fontFamily: 'AestheticFont', fontSize: 18)),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            Text('Hello, $name', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            _buildCard(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCard() {
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        color: cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9.0)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(children: [Image.asset('assets/images/list.png', width: 200, height: 200)]),
         ),
       ),
     );
